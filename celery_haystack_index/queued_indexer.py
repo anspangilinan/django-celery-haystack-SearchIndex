@@ -1,14 +1,14 @@
 from django.db.models import signals
 from django.db.models.loading import get_model
 
+from haystack import connections
 from haystack import indexes
-from haystack import site
 
 from tasks import SearchIndexUpdateTask
 
 def remove_instance_from_index(instance):
     model_class = get_model(instance._meta.app_label, instance._meta.module_name)
-    search_index = site.get_index(model_class)
+    search_index = connections['default'].get_unified_index.get_index(model_class)
     search_index.remove_object(instance)
 
 class QueuedSearchIndex(indexes.SearchIndex):

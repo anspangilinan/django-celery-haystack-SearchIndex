@@ -1,6 +1,6 @@
 from django.db.models.loading import get_model
 
-from haystack import site
+from haystack import connections
 from haystack.management.commands import update_index
 
 from celery.task import Task, PeriodicTask
@@ -17,7 +17,7 @@ class SearchIndexUpdateTask(Task):
         try:
             model_class = get_model(app_name, model_name)
             instance = model_class.objects.get(pk=pk)
-            search_index = site.get_index(model_class)
+            search_index = connections['default'].get_unified_index.get_index(model_class)
             search_index.update_object(instance)
         except Exception, exc:
             logger.error(exc)
